@@ -1,2 +1,2 @@
 [workspace]
-members = ["random"]
+members = ["random", "hashes"]

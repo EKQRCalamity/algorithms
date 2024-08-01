@@ -1,0 +1,6 @@
+[package]
+name = "hashes"
+version = "0.1.0"
+
+[dependencies]
+random = { path = "../random" }
