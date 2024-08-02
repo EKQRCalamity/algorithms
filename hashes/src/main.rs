@@ -1,13 +1,15 @@
 extern crate random;
 use random::lcg;
 use djb2::Djb2fn;
+use cityhash64::CityHash64fn;
 use fnv1a::FNV1Afn;
 
 mod djb2;
 mod fnv1a;
+mod cityhash64;
 
 struct HashCollisionChecker {
-    values: Vec<u32>,
+    values: Vec<u64>,
 }
 
 impl HashCollisionChecker {
@@ -17,19 +19,17 @@ impl HashCollisionChecker {
         }
     }
 
-    pub fn add_value(&mut self, i: u32) {
+    pub fn add_value(&mut self, i: u64) {
         self.values.push(i);
     }
 
-    pub fn check_collision(&mut self, hash: u32) -> bool {
+    pub fn check_collision(&mut self, hash: u64) -> bool {
 
         for &value in &self.values {
             if hash == value {
                 return true;
             }
         }
-
-
 
         self.add_value(hash);
 
@@ -59,7 +59,7 @@ fn main() {
     loop {
         i += 1;
         let random = rangen.random();
-        let hash = u128_to_str(random).fnv1a();
+        let hash = u128_to_str(random).cityhash();
         println!("[{}]: Random: {} - Hash: {}", i, u128_to_str(random), hash);
         if hashcollector.check_collision(hash) {
             println!("Hash Collision Detected!");
