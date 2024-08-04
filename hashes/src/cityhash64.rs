@@ -29,7 +29,7 @@ impl CityHash64 {
     pub fn load64(&self, data: &[u8]) -> u64 {
         let length = if data.len() > 8 { 8 } else { data.len() - 1 };
         let mut array = [0u8; 8];
-        array[..length].copy_from_slice(&data[0..length]);
+        array[..length].copy_from_slice(&data[..length]);
         u64::from_le_bytes(array)
     }
 
