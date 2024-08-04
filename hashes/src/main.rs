@@ -52,22 +52,38 @@ fn u128_to_str(i: u128) -> String {
     return output;
 }
 
+fn analyze_collisions(collisions: Vec<u32>) {
+    let mut mean: u32 = 0;
+    for collision in &collisions {
+        mean += collision;
+    }
+    mean = mean / (collisions.len() - 1) as u32;
+    println!("Mean: Collision after {} generations.", mean);
+}
+
 fn main() {
+    let start_time = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_secs_f64();
     let mut hashcollector = HashCollisionChecker::new();
     let mut rangen = lcg::LCG::new();
+    let mut collisions: Vec<u32> = Vec::new();
     let mut i = 0;
+    let max_collisions = 8000;
     loop {
         i += 1;
         let random = rangen.random();
         let hash = u128_to_str(random).cityhash();
-        println!("[{}]: Random: {} - Hash: {}", i, u128_to_str(random), hash);
         if hashcollector.check_collision(hash) {
-            println!("Hash Collision Detected!");
-            break;
-        }
-        if i == 200000000 {
-            break
+            collisions.push(i);
+            println!("[{}/{}] Hash Collision Detected after {} generations!", collisions.len(), max_collisions, i);
+            i = 0;
+            hashcollector = HashCollisionChecker::new();
+            rangen = lcg::LCG::new();
+            if collisions.len() > max_collisions - 1 {
+                analyze_collisions(collisions);
+                break;
+            }
         }
     }
-
+    let end_time = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_secs_f64();
+    println!("Main script finished after: {}s", end_time - start_time);
 }
